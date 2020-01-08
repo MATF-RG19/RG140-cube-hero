@@ -10,8 +10,9 @@ static int window_height, window_width;
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 static void on_display();
-static void on_timer(int id);
+/*static void on_timer(int id);*/
 
+int angle = 0;
 
 int main(int argc, char **argv)
 {
@@ -28,6 +29,7 @@ int main(int argc, char **argv)
 
     glClearColor(0, 0, 0.2, 0);
 
+    glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_DEPTH_TEST);
 
     glutMainLoop();
@@ -35,22 +37,110 @@ int main(int argc, char **argv)
     return 0;
 }
 
+void drawPlatformLines()
+{
+
+ glDisable(GL_LIGHTING);
+
+    glBegin(GL_LINES);
+        glColor3f(0,1,0);
+        glVertex3f(-0.2,0.05,-0.75);  
+        glVertex3f(-0.2,0.05,0.75);
+
+        glColor3f(1,0,0);
+        glVertex3f(-0.1,0.05,-0.75);  
+        glVertex3f(-0.1,0.05,0.75);  
+
+        glColor3f(1,1,0);
+        glVertex3f(0,0.05,-0.75); 
+        glVertex3f(0,0.05,0.75);
+
+        glColor3f(0,0,1);
+        glVertex3f(0.1,0.05,-0.75); 
+        glVertex3f(0.1,0.05,0.75);
+
+        glColor3f(1,0.6,0);
+        glVertex3f(0.2,0.05,-0.75); 
+        glVertex3f(0.2,0.05,0.75);
+
+    glEnd();
+
+    glEnable(GL_LIGHTING);
+}
+
+void drawSpeaker()
+{
+    
+    glPushMatrix();
+        glTranslatef(-1,0,-1);
+	glColor3f(0, 0, 0);
+	glScalef(0.3, 0.7, 0.3);
+	glutSolidCube(1);
+
+	glColor3f(1, 0, 0);
+	glTranslatef(0,0.1,0.5);
+	glutSolidTorus(0.1, 0.2, 30, 30);
+	
+
+    glPopMatrix();
+
+
+    glPushMatrix();
+	glTranslatef(1,0,-1);
+	glColor3f(0, 0, 0);
+	glScalef(0.3, 0.7, 0.3);
+	glutSolidCube(1);
+
+	glColor3f(1, 0, 0);
+	glTranslatef(0,0.1,0.5);
+	glutSolidTorus(0.1, 0.2, 30, 30);
+        
+    glPopMatrix();
+}
+
+
+void drawAxes()
+{
+
+ glDisable(GL_LIGHTING);
+
+    glBegin(GL_LINES);
+        glColor3f(1,0,0);
+        glVertex3f(0,0,0);
+        glVertex3f(15,0,0);
+
+        glColor3f(0,1,0);
+        glVertex3f(0,0,0);
+        glVertex3f(0,15,0);
+
+        glColor3f(0,0,1);
+        glVertex3f(0,0,0);
+        glVertex3f(0,0,15);
+    glEnd();
+
+    glEnable(GL_LIGHTING);
+}
+
+void drawPlatform()
+{
+    glPushMatrix();
+	glColor3f(0, 0, 0);
+	glScalef(0.5, 0.1, 1.5);
+	glutSolidCube(1);
+    glPopMatrix();
+}
+
 static void on_keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
-    case 'q':
+    case 's':
+    case 'S':
         exit(0);
-    case GLUT_KEY_UP:
-   	//TODO pomeranje platforme
+    case 'w':
+	angle+=30;
         break;
     case GLUT_KEY_DOWN:
-   	//TODO pomeranje platforme
-        break;
-    case GLUT_KEY_LEFT:
-   	//TODO pomeranje platforme
-        break;
-    case GLUT_KEY_RIGHT:
-   	//TODO pomeranje platforme
+   	/*TODO pomeranje platforme*/
         break;
     }
 }
@@ -62,7 +152,7 @@ static void on_reshape(int width, int height)
     glViewport(0, 0, window_width, window_height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, window_width/window_height, 1, 3);
+    gluPerspective(60, window_width/window_height, 1, 100);
 }
 
 static void on_display()
@@ -75,10 +165,11 @@ static void on_display()
             0, 0, 0,
             0, 1, 0
         );
-    
-    glColor3f(0, 0, 0);
-    glScalef(1, 0.1, 7);
-    glutSolidCube(1);
 
+    /*drawAxes();*/
+   /* glRotatef(angle, 1,0,0);*/
+    drawPlatformLines();
+    drawPlatform();
+    drawSpeaker();
     glutSwapBuffers();
 }
