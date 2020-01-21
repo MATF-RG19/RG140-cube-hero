@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stdint.h>
 #include <time.h>
+#include <GL/freeglut.h>
+#include <string.h>
 
 #define TIMER_ID 0
 #define TIMER_INTERVAL 30
@@ -35,7 +37,7 @@ static void on_reshape(int width, int height);
 static void on_display();
 static void on_timer(int id);
 
-int catchingHappened(float z_coord);
+
 
 int main(int argc, char **argv)
 {
@@ -49,6 +51,7 @@ int main(int argc, char **argv)
 
     animation_parameter = 0;
     timer_active = 0;
+    
 
     points_earned = 0;
     position = 0;
@@ -119,7 +122,7 @@ static void on_special(int key, int x, int y)
         case GLUT_KEY_RIGHT:  /* enabling viewing to the platform from the side. NOTE: this rotation can only be done when game is inactive*/
 	if (!timer_active && position == 0) 
 	     {  
-		position +=1.2;
+		position +=1.19;
 		glutPostRedisplay();
 	     }
         break;
@@ -134,7 +137,7 @@ static void on_keyboard(unsigned char key, int x, int y)
     switch (key) {
     case 27:        /* escape  ---> exiting game */
         { 
-	printf("Osvojili ste %d poena!\n", points_earned);
+	printf("%d\n", points_earned);
         exit(0);
         }
 	break;
@@ -205,6 +208,34 @@ static void on_reshape(int width, int height)
 }
 
 
+
+void addLights()
+{
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+
+    float light_position[] = {-2, -160, -40, 1};
+    float light_ambient[] = {0.5, 0.5, 0, 1};
+    float light_diffuse[] = {0.7, 0.8, 0.4, 1};
+    float light_specular[] = {0.3, 0.3, 0.3, 1};
+
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+
+    GLfloat ambient[] = {0.1,0.5,0,1};
+    GLfloat diffuse[] = {0.7,0.4,0,1};
+    GLfloat specular[] = {0.7,0.7,0.7,1};
+    GLfloat shininess = 80;
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+
+}
 
 void drawCubeOne()
 {
@@ -439,10 +470,11 @@ static void on_display()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(
-            position, 1.23, 1.23, 
+            position, 1.19, 1.19, 
             0, 0, 0,
             0, 1, 0  
         );
+
 
     /*drawAxes();*/
 
@@ -451,7 +483,7 @@ static void on_display()
     srand((unsigned) time(&t));
     
 
-    if ((int)(animation_parameter*speed) % 170 == 0)
+    if ((int)(animation_parameter*speed) % 150 == 0)
     {
       first_visible = rand()%2;
       second_visible = rand()%2;
@@ -470,17 +502,31 @@ static void on_display()
 
     z_coord +=(1/50.0*speed);  /*updating current position of the cubes*/
 
+
+
+    addLights();
+
+
     /*scene drawing part*/
 
     glPushMatrix();
     	glScalef(1+animation_parameter%20/200.0, 1+animation_parameter%20/200.0, 1+animation_parameter%20/200.0); /*adding 0-10% of size*/
     	drawSpeakers();
     glPopMatrix();
+
+
+   /*glPushMatrix();
+   glRasterPos2f(0,0);
+   glutBitmapString(GLUT_BITMAP_8_BY_13, (unsigned char*)"FirstTry");
+   glPopMatrix();*/
+    
+
  
    /*rotating part of the scene*/
  
     glRotatef(angle, 1, 0, 0);
     
+
     glPushMatrix();
         glTranslatef(0, 0, animation_parameter/50.0*speed);  
         drawCubes(first_visible, second_visible, third_visible, fourth_visible, fifth_visible);
@@ -495,6 +541,7 @@ static void on_display()
     glPushMatrix();
         drawPlatform();
     glPopMatrix();
+
 
 
     glutSwapBuffers();
